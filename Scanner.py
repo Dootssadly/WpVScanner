@@ -1,7 +1,6 @@
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup
-import tkinter as tk
-from tkinter import messagebox
 
 def get_wp_version(url):
     try:
@@ -29,30 +28,33 @@ def get_wp_version(url):
     except Exception as e:
         return f"Error: {str(e)}"
 
-def check_version():
-    url = url_entry.get().strip()
-    if not url:
-        messagebox.showwarning("Input Needed", "Please enter a website URL.")
-        return
+# Streamlit App
+st.set_page_config(page_title="WP Version Checker", page_icon="🧠", layout="centered")
 
-    result = get_wp_version(url)
-    result_label.config(text=result)
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #0e1117;
+        color: white;
+    }
+    .stApp {
+        background-color: #0e1117;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-# GUI setup
-root = tk.Tk()
-root.title("WordPress Version Checker")
-root.geometry("400x250")
-root.configure(bg="#1e1e1e")
+st.title("🔍 WordPress Version Checker")
 
-tk.Label(root, text="Enter website URL:", bg="#1e1e1e", fg="white", font=("Helvetica", 12)).pack(pady=10)
+url = st.text_input("Enter website URL", placeholder="e.g. https://example.com")
 
-url_entry = tk.Entry(root, width=40, font=("Helvetica", 12))
-url_entry.pack(pady=5)
-
-check_button = tk.Button(root, text="Check WordPress Version", command=check_version, bg="#007acc", fg="white", font=("Helvetica", 12, "bold"))
-check_button.pack(pady=15)
-
-result_label = tk.Label(root, text="", wraplength=350, bg="#1e1e1e", fg="lightgreen", font=("Helvetica", 12))
-result_label.pack(pady=10)
-
-root.mainloop()
+if st.button("Check Version"):
+    if url.strip():
+        with st.spinner("Checking..."):
+            version_info = get_wp_version(url.strip())
+        st.success(f"✅ {version_info}")
+    else:
+        st.warning("Please enter a valid URL.")
